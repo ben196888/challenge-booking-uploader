@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import Dropzone from 'react-dropzone';
+import Timeline from 'react-calendar-timeline';
 import csvtojson from 'csvtojson';
 import './App.css';
+import 'react-calendar-timeline/lib/Timeline.css';
 
 const apiUrl = 'http://localhost:3001'
 
@@ -73,7 +75,64 @@ class App extends Component {
       .then((bookings) => { this.setState({ bookings, newBookings: this.state.newBookings.filter(nB => nB.overlap) }) })
   }
 
+  /**
+   * Example code from https://github.com/namespace-ee/react-calendar-timeline/tree/master/examples#custom-item-rendering
+   *
+   * @memberof App
+   */
+  itemRenderer = ({ item, itemContext, getItemProps, getResizeProps }) => {
+    const { left: leftResizeProps, right: rightResizeProps } = getResizeProps();
+    const backgroundColor = itemContext.selected ? (itemContext.dragging ? 'red' : item.selectedBgColor) : item.bgColor;
+    const borderColor = itemContext.resizing ? 'red' : item.color;
+    return (
+      <div
+        {...getItemProps({
+          style: {
+            backgroundColor,
+            color: item.color,
+            borderColor,
+            borderStyle: 'solid',
+            borderWidth: 1,
+            borderRadius: 4,
+            borderLeftWidth: itemContext.selected ? 3 : 1,
+            borderRightWidth: itemContext.selected ? 3 : 1
+          },
+          onMouseDown: () => {
+            console.log('on item click', item);
+          }
+        })}
+      >
+        {itemContext.useResizeHandle ? <div {...leftResizeProps} /> : null}
+
+        <div
+          style={{
+            height: itemContext.dimensions.height,
+            overflow: 'hidden',
+            paddingLeft: 3,
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap'
+          }}
+        >
+          {itemContext.title}
+        </div>
+
+        {itemContext.useResizeHandle ? <div {...rightResizeProps} /> : null}
+      </div>
+    );
+  };
+
   render() {
+    const groups = [{ id: 1, title: 'group 1' }];
+    const items = ([...this.state.bookings, ...this.state.newBookings]).map((booking, i) => ({
+      id: i,
+      group: 1,
+      title: booking.userId,
+      start_time: booking.time,
+      end_time: booking.time + booking.duration,
+      color: booking.overlap ? 'red' : 'black',
+      bgColor: booking.overlap ? 'yellow' : booking.savedAt ? 'white' : 'grey'
+    }));
+
     return (
       <div className="App">
         <div className="App-header">
@@ -85,20 +144,14 @@ class App extends Component {
           </Dropzone>
         </div>
         <div className="App-main">
-          <p>Existing bookings:</p>
-          {
-            (this.state.bookings || []).map((booking, i) => {
-              const date = new Date(booking.time);
-              const duration = booking.duration / (60 * 1000);
-              return (
-                <p key={i} className="App-booking">
-                  <span className="App-booking-time">{date.toString()}</span>
-                  <span className="App-booking-duration">{duration.toFixed(1)}</span>
-                  <span className="App-booking-user">{booking.userId}</span>
-                </p>
-              )
-            })
-          }
+          <Timeline
+            groups={groups}
+            items={items}
+            stackItems
+            itemRenderer={this.itemRenderer}
+            defaultTimeStart={new Date('01 Mar 2018 11:00:00 GMT+1000')}
+            defaultTimeEnd={new Date('08 Mar 2018 11:00:00 GMT+1000')}
+          />
           <button onClick={this.onSave}>Save Non Overlap bookings</button>
         </div>
       </div>
