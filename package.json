@@ -6,7 +6,10 @@
     "cors": "^2.8.4",
     "csvtojson": "^2.0.8",
     "express": "^4.16.3",
+    "interactjs": "^1.4.4",
+    "moment": "^2.24.0",
     "react": "^16.4.2",
+    "react-calendar-timeline": "^0.25.1",
     "react-dom": "^16.4.2",
     "react-dropzone": "^5.0.0",
     "react-scripts": "1.1.4"
