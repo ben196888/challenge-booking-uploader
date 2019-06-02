@@ -5,13 +5,20 @@ import './App.css';
 
 const apiUrl = 'http://localhost:3001'
 
+const getData = (url = '') => fetch(url).then(response => response.json());
+const postData = (url = '', data = {}) =>
+  fetch(url, {
+    method: 'post',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  }).then(response => response.json());
+
 class App extends Component {
 
   state = { bookings: [], newBookings: [] }
 
   componentWillMount() {
-    fetch(`${apiUrl}/bookings`)
-      .then((response) => response.json())
+    getData(`${apiUrl}/bookings`)
       .then((bookings) => {
         this.setState({ bookings })
       })
@@ -53,6 +60,19 @@ class App extends Component {
     files.forEach(file => reader.readAsText(file));
   }
 
+  /**
+   * handle the save button
+   * saved all new bookings except the overlapped then fetch the bookings again
+   *
+   * @memberof App
+   */
+  onSave = async () => {
+    const nonOverlapNewBookings = this.state.newBookings.filter(nB => !nB.overlap);
+    await Promise.all(nonOverlapNewBookings.map(booking => postData(`${apiUrl}/bookings`, booking)))
+      .then(() => getData(`${apiUrl}/bookings`))
+      .then((bookings) => { this.setState({ bookings, newBookings: this.state.newBookings.filter(nB => nB.overlap) }) })
+  }
+
   render() {
     return (
       <div className="App">
@@ -79,6 +99,7 @@ class App extends Component {
               )
             })
           }
+          <button onClick={this.onSave}>Save Non Overlap bookings</button>
         </div>
       </div>
     );
