@@ -6,7 +6,7 @@ const apiUrl = 'http://localhost:3001'
 
 class App extends Component {
 
-  state = {}
+  state = { bookings: [], newBookings: [] }
 
   componentWillMount() {
     fetch(`${apiUrl}/bookings`)
