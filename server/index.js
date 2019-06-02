@@ -12,8 +12,24 @@ const bookings = JSON.parse(fs.readFileSync('./server/bookings.json'))
     userId: bookingRecord.user_id,
   }))
 
+/* interface for documentation
+interface Booking {
+  time: Date,
+  duration: number, // (ms)
+  userId: string,
+  savedAt: Date
+}
+*/
+
+/**
+ * @api {get} /bookings Request bookings list
+ * @apiName GetBookings
+ * @apiSuccess (200) {Booking[]}
+ */
 app.get('/bookings', (_, res) => {
+  console.debug('get bookings', bookings);
   res.json(bookings);
+  console.log('get bookings successful');
 });
 
 app.listen(3001);
