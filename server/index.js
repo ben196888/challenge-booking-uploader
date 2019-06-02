@@ -35,4 +35,17 @@ app.get('/bookings', (_, res) => {
   console.log('get bookings successful');
 });
 
+/**
+ * @api {post} /bookings Add new booking
+ * @apiName AddBookings
+ * @apiSuccess (200) {Booking[]}
+ */
+app.post('/bookings', (req, res) => {
+  savedAt = new Date();
+  bookings = [...bookings, { ...req.body, savedAt }];
+  console.debug('add bookings', bookings);
+  res.status(200).json(bookings);
+  console.log('add bookings successful');
+});
+
 app.listen(3001);
