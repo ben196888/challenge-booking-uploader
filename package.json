@@ -5,7 +5,7 @@
   "dependencies": {
     "cors": "^2.8.4",
     "csvtojson": "^2.0.8",
-    "express": "^4.16.3",
+    "express": "^4.17.3",
     "interactjs": "^1.4.4",
     "moment": "^2.24.0",
     "react": "^16.4.2",
